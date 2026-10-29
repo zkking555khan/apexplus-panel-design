@@ -50,6 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset(site_themes()[$theme_post])) { $saved['theme'] = $theme_post; }
             $markup_post = trim($_POST['markup_percent'] ?? '');
             if ($markup_post !== '' && is_numeric($markup_post) && (float) $markup_post >= 0 && (float) $markup_post <= 1000) { $saved['markup_percent'] = (float) $markup_post; }
+            $fx_post = trim($_POST['currency_rate'] ?? '');
+            if ($fx_post !== '' && is_numeric($fx_post) && (float) $fx_post > 0) { $saved['currency_rate'] = (float) $fx_post; }
             $os_url = trim($_POST['other_services_url'] ?? '');
             if ($os_url === '' || (filter_var($os_url, FILTER_VALIDATE_URL) && preg_match('#^https?://#i', $os_url))) { $saved['other_services_url'] = $os_url; }
             $saved['other_services_label'] = substr(trim($_POST['other_services_label'] ?? ''), 0, 60);
@@ -128,6 +130,8 @@ require __DIR__ . '/includes/header.php';
   <select id="theme" name="theme"><?php foreach (site_themes() as $key => $label): ?><option value="<?php echo htmlspecialchars($key); ?>"<?php echo current_theme($config) === $key ? ' selected' : ''; ?>><?php echo htmlspecialchars($label); ?></option><?php endforeach; ?></select>
   <label for="markup_percent">Markup % on service rates (e.g. 20 = provider rate + 20%)</label>
   <input type="number" id="markup_percent" name="markup_percent" min="0" max="1000" step="0.01" value="<?php echo htmlspecialchars((string) ($config['markup_percent'] ?? 0)); ?>">
+  <label for="currency_rate">USD to PKR rate (provider rates are in USD; 1 USD = ? PKR)</label>
+  <input type="number" id="currency_rate" name="currency_rate" min="0.01" step="0.01" value="<?php echo htmlspecialchars((string) ($config['currency_rate'] ?? 277.46)); ?>">
   <label for="other_services_label">Other Services button text</label>
   <input type="text" id="other_services_label" name="other_services_label" maxlength="60" value="<?php echo htmlspecialchars($config['other_services_label'] ?? 'Go to Other Services'); ?>">
   <label for="other_services_url">Other Services button link (set by admin)</label>
