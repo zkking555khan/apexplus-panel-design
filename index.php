@@ -24,7 +24,7 @@ if (trim((string) ($config['provider']['api_key'] ?? '')) !== '' && trim((string
         $overrides = load_service_overrides(db_connect());
         $merged = apply_service_overrides($svc['services'], $overrides);
         foreach ($merged as $row) {
-            $retail = retail_price($row['rate'] ?? $row['price'] ?? null, category_markup_percent($config, (string) ($row['category'] ?? '')));
+            $retail = retail_price($row['rate'] ?? $row['price'] ?? null, category_markup_percent($config, (string) ($row['category'] ?? '')), empty($row['_manual']));
             // Zero-rate rows are unpriced placeholders, not free
             // offers: they must never become the advertised
             // "starting from" price. Skip them; if every row is
