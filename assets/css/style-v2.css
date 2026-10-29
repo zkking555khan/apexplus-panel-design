@@ -1,0 +1,400 @@
+/* SMM APEX PLUS — v2 stylesheet (SPEC ONLY, not live).
+   Slight evolution of v1's style.css: same pages, same 4 themes, same
+   logo and brand. Changes: spacing/type scale, multi-colour accents
+   (muted, dark-theme-safe, never full fills), service cards, status
+   pills, sticky charge bar, and SMOOTH animation only.
+   FORBIDDEN here by design: blink, pulse, flashing, strobing.
+   Check before release: grep -iE 'blink|pulse' style-v2.css must be empty
+   except for this comment. Icon/logo borders are never black. */
+
+/* ---------- tokens: base + accents (theme-aware below) ---------- */
+:root {
+  --radius-sm: 10px; --radius: 16px; --radius-lg: 20px;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 32px;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --dur-fast: 180ms; --dur-med: 300ms; --dur-slow: 500ms;
+  --shadow-card: 0 4px 18px rgba(0, 0, 0, .25);
+  --shadow-lift: 0 10px 28px rgba(0, 0, 0, .35);
+  /* Muted multi-colour accents — tags, borders, icons only, never fills. */
+  --accent-teal: #2dd4bf; --accent-violet: #a78bfa; --accent-amber: #fbbf24;
+  --accent-rose: #fb7185; --accent-emerald: #34d399; --accent-sky: #38bdf8;
+  --success: #34d399; --warning: #fbbf24; --danger: #fb7185;
+}
+
+/* v1 themes, kept, plus per-theme accent remapping (same hues, tuned). */
+:root, [data-theme="midnight-navy"] {
+  --navy: #0a1428; --navy-2: #0f1f3d; --black: #05080f;
+  --blue: #2563eb; --blue-light: #60a5fa; --silver: #cbd5e1;
+  --text: #e2e8f0; --muted: #94a3b8; --card: #111d33; --border: #24365c;
+  --input-bg: #0b1526; --notice-bg: #1e293b;
+}
+[data-theme="emerald-night"] {
+  --navy: #052e22; --navy-2: #064e3b; --black: #04100c;
+  --blue: #10b981; --blue-light: #34d399; --silver: #d1fae5;
+  --text: #ecfdf5; --muted: #9ca3af; --card: #0a1f18; --border: #1e3a2f;
+  --input-bg: #08251c; --notice-bg: #123528;
+}
+[data-theme="royal-purple"] {
+  --navy: #1e1035; --navy-2: #2e1a5e; --black: #0d0716;
+  --blue: #8b5cf6; --blue-light: #a78bfa; --silver: #e9d5ff;
+  --text: #f5f3ff; --muted: #a1a1aa; --card: #1a1030; --border: #3b2a5e;
+  --input-bg: #1c1238; --notice-bg: #2a1a4d;
+}
+[data-theme="ocean-teal"] {
+  --navy: #083344; --navy-2: #0e4a5e; --black: #031418;
+  --blue: #0891b2; --blue-light: #67e8f9; --silver: #cffafe;
+  --text: #ecfeff; --muted: #94a3b8; --card: #0a2530; --border: #164e63;
+  --input-bg: #0a2a38; --notice-bg: #12384a;
+}
+/* Daylight (default, 2026-10-29): white paper, not a dark theme recoloured.
+   Text is dark slate, accents are muted/darkened so they stay readable
+   on white. Shadows are soft grey, never heavy black. */
+[data-theme="daylight"] {
+  --navy: #f8fafc; --navy-2: #ffffff; --black: #f1f5f9;
+  --blue: #2563eb; --blue-light: #2563eb; --silver: #334155;
+  --text: #0f172a; --muted: #64748b; --card: #ffffff; --border: #e2e8f0;
+  --input-bg: #ffffff; --notice-bg: #ffffff;
+  --shadow-card: 0 4px 18px rgba(15, 23, 42, .08);
+  --shadow-lift: 0 12px 28px rgba(15, 23, 42, .12);
+  --accent-teal: #0f766e; --accent-violet: #7c3aed; --accent-amber: #b45309;
+  --accent-rose: #e11d48; --accent-emerald: #059669; --accent-sky: #0284c7;
+  --success: #059669; --warning: #b45309; --danger: #e11d48;
+}
+
+/* ---------- base (mobile-first) ---------- */
+* { box-sizing: border-box; }
+body {
+  margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--black); color: var(--text); line-height: 1.55; font-size: 16px;
+  transition: background-color var(--dur-med) var(--ease-out), color var(--dur-med) var(--ease-out);
+}
+a { color: var(--blue-light); }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible,
+textarea:focus-visible { outline: 2px solid var(--blue-light); outline-offset: 2px; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 var(--space-4); }
+h1 { font-size: clamp(1.6rem, 6vw, 2.4rem); line-height: 1.2; margin: var(--space-5) 0 var(--space-3); }
+h2 { font-size: 1.25rem; line-height: 1.3; margin: var(--space-6) 0 var(--space-3); }
+h3 { margin-top: 0; color: #fff; }
+
+/* ---------- header / nav (v1 structure, polished) ---------- */
+.site-header {
+  background: linear-gradient(180deg, var(--navy), var(--navy-2));
+  border-bottom: 3px solid var(--blue); position: sticky; top: 0; z-index: 10;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .35);
+  transition: background-color var(--dur-med) var(--ease-out);
+}
+.header-inner { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); padding-top: var(--space-3); padding-bottom: var(--space-3); flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; color: #fff; font-weight: 800; letter-spacing: .5px; }
+.brand img { border-radius: 50%; border: 2px solid var(--silver); background: var(--navy-2); }
+.brand-text span { color: var(--blue-light); }
+.main-nav { display: none; width: 100%; flex-direction: column; align-items: flex-start; gap: var(--space-2); overflow: hidden; max-height: 0; transition: max-height 250ms var(--ease-out); }
+.main-nav.open { display: flex; max-height: 480px; }
+.main-nav a { color: var(--silver); text-decoration: none; font-weight: 600; padding: 10px 12px; border-radius: 999px; min-height: 44px; display: flex; align-items: center; transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out); }
+.main-nav a.active, .main-nav a:hover { color: #fff; background: rgba(255, 255, 255, .12); }
+.nav-toggle { display: block; background: var(--blue); color: #fff; border: 0; border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3); font-size: 18px; min-height: 44px; min-width: 44px; }
+/* Header theme switcher (top of every page): visitor's own choice, saved
+   on their device only — it never changes the admin site default. */
+.theme-switch { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--silver); margin: 0; }
+.theme-switch select { width: auto; min-height: 40px; padding: 8px 10px; font-size: 14px; background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+/* Small theme toggle button (white <-> dark), like his own site:
+   one round button in the header, no dropdown, no label text. */
+.theme-toggle { width: 38px; height: 38px; min-width: 38px; display: inline-flex; align-items: center; justify-content: center; padding: 0; font-size: 18px; line-height: 1; background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 50%; cursor: pointer; }
+.theme-toggle svg, .nav-toggle svg { width: 20px; height: 20px; display: block; }
+
+/* ---------- buttons, forms ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 18px; border-radius: 12px; text-decoration: none; font-weight: 700; border: 0; cursor: pointer; transition: transform var(--dur-fast) var(--ease-out), filter var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out); }
+.btn:hover { transform: translateY(-1px); }
+.btn-blue { background: var(--blue); color: #fff !important; }
+.btn-blue:hover { filter: brightness(1.15); }
+.btn-outline { background: transparent; color: var(--silver); border: 1px solid var(--border); }
+button { background: var(--blue); color: #fff; border: 0; border-radius: 12px; padding: 10px 16px; font-weight: 700; cursor: pointer; min-height: 44px; transition: transform var(--dur-fast) var(--ease-out), filter var(--dur-fast) var(--ease-out); }
+button:hover { transform: translateY(-1px); }
+button:disabled, .btn[aria-disabled="true"] { opacity: .55; cursor: not-allowed; transform: none; }
+form { max-width: 520px; }
+label { display: block; margin: 14px 0 4px; font-weight: 600; }
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="url"], select, textarea {
+  width: 100%; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+  background: var(--input-bg); color: var(--text); font-size: 16px; min-height: 48px;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+input:focus, select:focus, textarea:focus { border-color: var(--blue-light); }
+
+/* ---------- hero, grids, cards (v1 structure + accents + motion) ---------- */
+.hero { padding: 40px 0 24px; }
+.hero h1 { font-size: clamp(2rem, 8vw, 3.2rem); line-height: 1.15; margin: 0 0 12px; }
+.hero h1 em { color: var(--blue-light); font-style: normal; }
+.hero-accent { height: 4px; width: 96px; border-radius: 999px; margin-top: 12px;
+  background: linear-gradient(90deg, var(--blue-light), var(--accent-teal));
+  background-size: 200% 100%; transition: background-position 6s linear; }
+.hero-accent.swept { background-position: 100% 0; }
+.hero p { color: var(--muted); max-width: 640px; }
+.hero-actions { display: flex; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-5); }
+.platform-chips { display: flex; gap: var(--space-2); overflow-x: auto; padding: 4px 0 8px; margin-top: var(--space-4); scrollbar-width: thin; }
+.chip { flex: 0 0 auto; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); color: var(--silver); text-decoration: none; font-weight: 600; font-size: 14px; min-height: 40px; display: inline-flex; align-items: center; transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out); }
+.chip:hover { transform: translateY(-1px); border-color: var(--blue-light); }
+.chip.active { border-color: var(--blue-light); background: var(--notice-bg); color: var(--text); }
+/* Header Login button: prominent, like the panel's own login button but
+   clearer — solid blue in the header, outline for Sign Up. */
+.main-nav a.nav-login { background: var(--blue); color: #fff !important; border-radius: 12px; padding: 10px 20px; box-shadow: 0 4px 14px rgba(37, 99, 235, .25); }
+.main-nav a.nav-login:hover { background: #1d4ed8; color: #fff; }
+.main-nav a.nav-signup { border: 1px solid var(--border); border-radius: 12px; }
+/* Login page: the Log In button is full-width and taller, so it is
+   unmissable on a phone. */
+.btn-login { width: 100%; padding: 14px 18px; font-size: 17px; }
+/* Homepage login card (bottom of the home page, like his own site's
+   login section): centred, rounded, big blue button. The form itself
+   posts to login.php, so a successful sign-in goes straight to the
+   order page, exactly like the standalone login page. */
+.login-card-section { max-width: 520px; margin: 36px auto 8px; }
+.login-card { text-align: center; padding: 28px 24px; }
+.login-card h2 { margin: 0 0 4px; }
+.login-subtitle { color: var(--muted); margin: 0 0 8px; }
+.login-card form { text-align: left; margin: 0 auto; }
+.login-card input[type="text"], .login-card input[type="password"] { border-radius: 12px; padding: 14px; }
+.login-alt { text-align: center; margin: 16px 0 0; }
+/* Balance card (dashboard + new order): a little designed, not plain.
+   White in Daylight, card-coloured in dark themes; amount uses the
+   theme text colour, so it stays readable everywhere. No gradient,
+   no glow — just a blue top bar, a big amount, and a solid button. */
+.balance-card { border-top: 4px solid var(--blue); }
+.balance-label { font-size: 12px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+.balance-amount { font-size: 2rem; font-weight: 800; color: var(--text); margin: 0 0 6px; line-height: 1.2; }
+.balance-note { color: var(--muted); margin: 0 0 14px; }
+.balance-card-compact { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); flex-wrap: wrap; margin: var(--space-4) 0; }
+.balance-card-compact .balance-amount { font-size: 1.6rem; margin: 0; }
+.chip-instagram { border-left: 3px solid var(--accent-rose); }
+.chip-tiktok { border-left: 3px solid var(--accent-teal); }
+.chip-youtube { border-left: 3px solid var(--accent-amber); }
+.chip-facebook { border-left: 3px solid var(--accent-sky); }
+.chip-telegram { border-left: 3px solid var(--accent-violet); }
+.chip-x { border-left: 3px solid var(--silver); }
+
+.grid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); margin: 24px 0; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-5); box-shadow: var(--shadow-card); transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out), background-color var(--dur-med) var(--ease-out); }
+.card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+.card p { color: var(--muted); }
+.card-accent-teal { border-top: 3px solid var(--accent-teal); }
+.card-accent-violet { border-top: 3px solid var(--accent-violet); }
+.card-accent-amber { border-top: 3px solid var(--accent-amber); }
+.card-accent-emerald { border-top: 3px solid var(--accent-emerald); }
+.stat-value { font-size: 1.6rem; font-weight: 800; color: #fff; }
+.steps { counter-reset: step; list-style: none; padding: 0; display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
+.steps li { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-5); transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out); }
+.steps li:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+.steps li strong { display: block; color: #fff; margin-bottom: 6px; }
+.step-num { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--blue); color: #fff; font-weight: 800; margin-bottom: 8px; }
+
+/* ---------- notices, pills, tags ---------- */
+.notice { background: var(--notice-bg); border: 1px solid var(--border); border-left: 3px solid var(--blue-light); border-radius: 14px; padding: 10px 14px; margin: 12px 0; color: var(--silver); font-size: 14px; line-height: 1.45; box-shadow: 0 2px 10px rgba(0, 0, 0, .18); }
+.notice-success { border-left-color: var(--success); }
+.notice-warning { border-left-color: var(--warning); }
+.notice-danger { border-left-color: var(--danger); }
+.pill { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; border: 1px solid var(--border); background: var(--notice-bg); color: var(--silver); }
+.pill-pending { color: var(--accent-amber); border-color: var(--accent-amber); }
+.pill-sent { color: var(--accent-sky); border-color: var(--accent-sky); }
+.pill-completed { color: var(--success); border-color: var(--success); }
+.pill-cancelled, .pill-refunded { color: var(--danger); border-color: var(--danger); }
+.tag { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--notice-bg); color: var(--silver); border: 1px solid var(--border); }
+.tag-teal { color: var(--accent-teal); border-color: var(--accent-teal); }
+.tag-violet { color: var(--accent-violet); border-color: var(--accent-violet); }
+.tag-amber { color: var(--accent-amber); border-color: var(--accent-amber); }
+.tag-rose { color: var(--accent-rose); border-color: var(--accent-rose); }
+.tag-emerald { color: var(--accent-emerald); border-color: var(--accent-emerald); }
+.placeholder { border: 1px dashed var(--blue-light); }
+
+/* ---------- services: filter, cards (mobile) ---------- */
+.filter-form { max-width: none; display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: end; }
+.filter-form label { margin: 0; flex: 1 1 160px; }
+.filter-form input, .filter-form select { width: 100%; }
+.service-cards { display: grid; grid-template-columns: 1fr; gap: var(--space-4); margin: 20px 0; }
+.service-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-4); box-shadow: var(--shadow-card); transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out); }
+.service-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+.service-card h3 { margin: 0 0 6px; font-size: 16px; }
+.service-price { font-size: 1.25rem; font-weight: 800; color: #fff; }
+.service-meta { display: flex; gap: var(--space-2); flex-wrap: wrap; margin: 8px 0; color: var(--muted); font-size: 14px; }
+.service-card details { margin-top: 10px; }
+.service-card summary { cursor: pointer; font-weight: 600; color: var(--blue-light); }
+.service-card details[open] summary { margin-bottom: 8px; }
+
+/* ---------- tables (desktop services / orders) ---------- */
+/* Services table is desktop-only; mobile uses .service-cards. Other
+   tables (orders, dashboard) are NOT hidden — they use .table-wrap scroll. */
+.service-table { display: none; }
+.table-wrap { overflow-x: auto; margin: 20px 0; }
+table { width: 100%; border-collapse: collapse; min-width: 560px; }
+th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); }
+th { color: var(--silver); font-size: 14px; }
+tbody tr { transition: background-color var(--dur-fast) var(--ease-out); }
+tbody tr:hover { background: rgba(255, 255, 255, .04); }
+
+/* ---------- new order: sticky charge bar, steppers ---------- */
+.charge-bar { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-4); margin: var(--space-4) 0; box-shadow: var(--shadow-card); display: flex; gap: var(--space-4); flex-wrap: wrap; align-items: center; }
+.charge-bar .charge-total { font-size: 1.4rem; font-weight: 800; color: #fff; margin-left: auto; }
+/* Charge bar placement (2026-10-29, corrected per his clarification):
+   NOT fixed to the screen and NOT sticky — it sits in the normal
+   form flow, immediately above the Place Your Order button, and
+   scrolls with the page like every other field. Its position
+   relative to the button never changes: it cannot float over the
+   service dropdown, the footer, or anything else. */
+.charge-bar { margin-bottom: var(--space-4); }
+.qty-row { display: flex; gap: var(--space-2); align-items: center; }
+.qty-row input { flex: 1; }
+.qty-btn { min-width: 44px; padding: 10px; }
+.qty-pill { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); color: var(--silver); font-weight: 600; font-size: 14px; min-height: 36px; }
+
+/* ---------- add funds: payment cards + descriptions ---------- */
+.pay-card { border-left: 3px solid var(--blue-light); }
+.pay-card-easypaisa { border-left-color: var(--accent-emerald); }
+.pay-card-jazzcash { border-left-color: var(--accent-rose); }
+.pay-card-upaisa { border-left-color: var(--accent-amber); }
+.pay-desc { color: var(--muted); font-size: 14px; line-height: 1.45; margin: 8px 0 0; }
+.pay-number { font-size: 1.15rem; font-weight: 800; color: #fff; word-break: break-all; }
+
+/* ---------- footer ---------- */
+.site-footer { margin-top: 48px; border-top: 3px solid var(--blue); background: var(--navy); padding: 28px 0; }
+.footer-inner { display: flex; justify-content: space-between; gap: var(--space-5); flex-wrap: wrap; }
+.small { color: var(--muted); font-size: 14px; }
+
+/* ---------- entrance animation (smooth only; JS adds .reveal) ---------- */
+@keyframes v2-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.reveal { animation: v2-rise var(--dur-slow) var(--ease-out) both; animation-delay: var(--reveal-delay, 0ms); }
+
+/* ---------- desktop (>= 760px): grids, nav, tables ---------- */
+@media (min-width: 760px) {
+  .nav-toggle { display: none; }
+  .main-nav { display: flex; width: auto; flex-direction: row; flex-wrap: wrap; max-height: none; overflow: visible; }
+  .main-nav a { min-height: auto; }
+  .grid { grid-template-columns: repeat(3, 1fr); }
+  .steps { grid-template-columns: repeat(3, 1fr); }
+  .service-cards { display: none; }
+  .service-table { display: block; }
+  .hero { padding: 56px 0 24px; }
+}
+
+/* ---------- daylight: animated white background + light overrides ----------
+   Why this does not look AI-made: no purple/blue neon gradient, no glass,
+   no glowing orbs. It looks like daylight on white paper — two very soft,
+   warm light washes that drift almost imperceptibly (one full drift takes
+   48 seconds, then eases back), over a faint printed dot grid. Nothing
+   flashes, pulses or blinks; the page is fully readable with motion off. */
+[data-theme="daylight"] body {
+  /* Page is light grey now (2026-10-29 fix): when page, cards and
+     header were all pure white, everything blended into one white
+     sheet. Grey page + white cards + blue buttons = clear layers. */
+  background-color: #f1f5f9;
+  background-image:
+    radial-gradient(720px 480px at 12% -4%, rgba(254, 215, 170, .38), rgba(254, 215, 170, 0) 70%),
+    radial-gradient(760px 520px at 96% 108%, rgba(186, 230, 253, .34), rgba(186, 230, 253, 0) 70%),
+    radial-gradient(rgba(15, 23, 42, .055) 1px, transparent 1.4px);
+  background-size: 115% 115%, 115% 115%, 28px 28px;
+  background-repeat: no-repeat, no-repeat, repeat;
+  animation: daylight-drift 48s ease-in-out infinite alternate;
+}
+@keyframes daylight-drift {
+  from { background-position: 0% 0%, 100% 100%, 0 0; }
+  to { background-position: 6% 10%, 94% 90%, 0 0; }
+}
+/* Light header/footer: white, soft border, dark text. */
+[data-theme="daylight"] .site-header {
+  background: #ffffff; border-bottom: 1px solid var(--border);
+  box-shadow: 0 4px 18px rgba(15, 23, 42, .06);
+}
+[data-theme="daylight"] .site-footer { background: #ffffff; border-top: 1px solid var(--border); }
+/* Hardcoded white text in the dark themes must go dark on white cards. */
+[data-theme="daylight"] h3, [data-theme="daylight"] .stat-value,
+[data-theme="daylight"] .service-price, [data-theme="daylight"] .pay-number,
+[data-theme="daylight"] .charge-bar .charge-total, [data-theme="daylight"] .steps li strong,
+[data-theme="daylight"] .faq summary, [data-theme="daylight"] .other-subtitle,
+[data-theme="daylight"] .other-compact a strong, [data-theme="daylight"] .brand { color: #0f172a; }
+[data-theme="daylight"] .brand img { background: #ffffff; border-color: #e2e8f0; }
+[data-theme="daylight"] .main-nav a { color: #475569; }
+[data-theme="daylight"] .main-nav a.active, [data-theme="daylight"] .main-nav a:hover { color: #0f172a; background: rgba(15, 23, 42, .06); }
+[data-theme="daylight"] .nav-toggle { background: var(--blue); color: #fff; }
+[data-theme="daylight"] tbody tr:hover { background: rgba(15, 23, 42, .03); }
+[data-theme="daylight"] .notice { box-shadow: 0 2px 10px rgba(15, 23, 42, .06); }
+[data-theme="daylight"] .hero-accent {
+  background: linear-gradient(90deg, var(--blue-light), var(--accent-teal), var(--accent-amber));
+}
+/* ---------- daylight, apexplus.website-inspired buttons ----------
+   What was taken from apexplus.website (looked at live, read-only):
+   white page, white cards with thin light-grey borders, and SOLID bright
+   royal-blue buttons with white bold text and rounded-rectangle corners
+   (not full pills). Prices in bold bright blue, like that site.
+   What was NOT copied: its dark hero banner, its green WhatsApp buttons,
+   its text, or its product images. This panel keeps its white hero and
+   its own copy; only the button/blue language is inspired by it. */
+[data-theme="daylight"] .btn, [data-theme="daylight"] button,
+[data-theme="daylight"] .btn-blue, [data-theme="daylight"] .qty-btn {
+  border-radius: 12px; background: var(--blue); color: #fff;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, .25);
+}
+[data-theme="daylight"] .btn:hover, [data-theme="daylight"] button:hover { filter: none; background: #1d4ed8; }
+[data-theme="daylight"] .btn-outline { background: #ffffff; color: #0f172a; border: 1px solid var(--border); box-shadow: none; }
+[data-theme="daylight"] .btn-outline:hover { background: #f1f5f9; border-color: var(--blue); }
+[data-theme="daylight"] .main-nav a.active { background: #f1f5f9; color: #0f172a; }
+[data-theme="daylight"] .service-price { color: var(--blue); }
+[data-theme="daylight"] .step-num { background: var(--blue); }
+/* Quantity pills stay light — they are choices, not primary actions. */
+[data-theme="daylight"] .qty-pill { background: #ffffff; color: #334155; box-shadow: none; border: 1px solid var(--border); }
+[data-theme="daylight"] .qty-pill:hover { background: #f1f5f9; }
+
+/* ---------- reduced motion: all v2 motion off, content visible ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .main-nav { max-height: none; }
+  .reveal { opacity: 1; transform: none; }
+}
+
+/* ---------- phase 2 additions: homepage hero, FAQ, Other Services card, admin overview ----------
+   Same tokens, same smooth-motion language as phase 1. The Other Services
+   card's accent bar sweeps once on hover (a background-position
+   transition), it never loops and never flashes. Content is fully
+   visible without hover and without JS. */
+.eyebrow { font-size: 12px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--blue-light); margin: 0 0 var(--space-2); }
+.hero-v2 { padding: 48px 0 24px; }
+.hero-lead { font-size: 1.1rem; color: var(--muted); max-width: 680px; }
+.starting-from { background: var(--notice-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent-emerald); border-radius: 14px; padding: 10px 14px; color: var(--silver); font-size: 14px; }
+.faq { display: grid; gap: var(--space-3); margin: 20px 0; }
+.faq details { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-4); transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out); }
+.faq details:hover { transform: translateY(-1px); box-shadow: var(--shadow-card); }
+.faq summary { cursor: pointer; font-weight: 700; color: #fff; }
+.faq details[open] summary { margin-bottom: 8px; }
+.faq p { color: var(--muted); margin: 8px 0 0; }
+
+/* Other Services preview card: descriptive, animated on hover, one clear action. */
+.other-card { position: relative; overflow: hidden; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-5); margin: var(--space-6) 0; box-shadow: var(--shadow-card); transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out); }
+.other-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(180deg, var(--blue-light), var(--accent-teal)); background-size: 100% 200%; transition: background-position var(--dur-slow) var(--ease-out); }
+.other-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); }
+.other-card:hover::before { background-position: 0 100%; }
+.other-card h3 { margin: 0 0 6px; font-size: 1.4rem; }
+.other-subtitle { font-size: 1.05rem; font-weight: 700; color: #fff; margin: 0 0 8px; }
+.other-card p { color: var(--muted); }
+.other-compact a { display: block; text-decoration: none; padding: 10px 12px; border-radius: var(--radius-sm); }
+.other-compact a strong { display: block; color: #fff; }
+.other-compact a span { display: block; font-size: 12px; color: var(--muted); }
+
+/* Admin overview: same card system as the customer dashboard. */
+.admin-overview .stat-value { font-size: 1.8rem; }
+.admin-overview .card p:last-child { margin-bottom: 0; }
+
+/* Site additions (deploy): datetime-local + search inputs match other inputs. */
+input[type="datetime-local"], input[type="search"] {
+  width: 100%; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+  background: var(--input-bg); color: var(--text); font-size: 16px; min-height: 48px;
+}
+
+/* Homepage redesign (2026-10-29, his order: redesign the first page,
+   do not remove it): left-aligned hero with a specific headline,
+   no entrance animations, no decorative gradient bar, and the four
+   feature cards replaced by a plain bordered list — same links and
+   same copy, just a calmer business layout. */
+.home-hero { text-align: left; }
+.home-hero h1 { font-size: clamp(1.8rem, 6vw, 2.6rem); }
+.platform-label { font-weight: 700; margin: 24px 0 4px; }
+.home-rule { border: 0; border-top: 1px solid var(--border); margin: 8px 0 32px; }
+.feature-list { border-top: 1px solid var(--border); margin: 20px 0 32px; }
+.feature-row { border-bottom: 1px solid var(--border); padding: 20px 0; }
+.feature-row h3 { margin: 0 0 6px; }
+.feature-row p { color: var(--muted); margin: 0 0 8px; }
+.feature-row p:last-child { margin-bottom: 0; }
