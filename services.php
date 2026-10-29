@@ -75,8 +75,8 @@ if ($filter_sort === 'price_asc' || $filter_sort === 'price_desc' || $filter_sor
     if ($filter_sort === 'name_asc') {
       return strcmp((string) ($a['name'] ?? $a['service'] ?? ''), (string) ($b['name'] ?? $b['service'] ?? ''));
     }
-    $pa = retail_price($a['rate'] ?? $a['price'] ?? null, category_markup_percent($config, (string) ($a['category'] ?? '')));
-    $pb = retail_price($b['rate'] ?? $b['price'] ?? null, category_markup_percent($config, (string) ($b['category'] ?? '')));
+    $pa = retail_price($a['rate'] ?? $a['price'] ?? null, category_markup_percent($config, (string) ($a['category'] ?? '')), empty($a['_manual']));
+    $pb = retail_price($b['rate'] ?? $b['price'] ?? null, category_markup_percent($config, (string) ($b['category'] ?? '')), empty($b['_manual']));
     $pa = $pa === null ? PHP_FLOAT_MAX : $pa;
     $pb = $pb === null ? PHP_FLOAT_MAX : $pb;
     return $filter_sort === 'price_asc' ? ($pa <=> $pb) : ($pb <=> $pa);
@@ -138,7 +138,7 @@ function service_extra_details($row) {
 <?php else: ?>
   <?php if ($total_shown > 100): ?><p class="small">Showing <?php echo (int) (($page - 1) * $per_page + 1); ?>–<?php echo (int) min($total_shown, $page * $per_page); ?> of <?php echo (int) $total_shown; ?> services.</p><?php endif; ?>
   <div class="service-cards">
-    <?php foreach ($paged as $row): $raw_rate = $row['rate'] ?? $row['price'] ?? null; $retail = retail_price($raw_rate, category_markup_percent($config, (string) ($row['category'] ?? ''))); $row_id = (string) ($row['service'] ?? $row['id'] ?? ''); $dt = service_delivery_time($row); $extras = service_extra_details($row); ?>
+    <?php foreach ($paged as $row): $raw_rate = $row['rate'] ?? $row['price'] ?? null; $retail = retail_price($raw_rate, category_markup_percent($config, (string) ($row['category'] ?? '')), empty($row['_manual'])); $row_id = (string) ($row['service'] ?? $row['id'] ?? ''); $dt = service_delivery_time($row); $extras = service_extra_details($row); ?>
     <div class="service-card">
       <h3><?php echo htmlspecialchars((string) ($row['name'] ?? $row['service'] ?? '—')); ?></h3>
       <p class="service-price"><?php echo $retail === null ? '—' : htmlspecialchars(number_format($retail, 2) . ' ' . $config['currency']); ?> <span class="small">/ 1,000</span></p>
@@ -163,7 +163,7 @@ function service_extra_details($row) {
       <tr><th>Service</th><th>Category</th><th>Price (<?php echo htmlspecialchars($config['currency']); ?>) / 1,000</th><th>Min</th><th>Max</th><th>Delivery Time</th><th>Details</th><th></th></tr>
     </thead>
     <tbody>
-      <?php foreach ($paged as $row): $raw_rate = $row['rate'] ?? $row['price'] ?? null; $retail = retail_price($raw_rate, category_markup_percent($config, (string) ($row['category'] ?? ''))); $row_id = (string) ($row['service'] ?? $row['id'] ?? ''); $dt = service_delivery_time($row); $extras = service_extra_details($row); ?>
+      <?php foreach ($paged as $row): $raw_rate = $row['rate'] ?? $row['price'] ?? null; $retail = retail_price($raw_rate, category_markup_percent($config, (string) ($row['category'] ?? '')), empty($row['_manual'])); $row_id = (string) ($row['service'] ?? $row['id'] ?? ''); $dt = service_delivery_time($row); $extras = service_extra_details($row); ?>
       <tr>
         <td><?php echo htmlspecialchars((string) ($row['name'] ?? $row['service'] ?? '—')); ?></td>
         <td><?php echo htmlspecialchars((string) ($row['category'] ?? '—')); ?></td>
