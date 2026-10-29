@@ -141,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = 'Please shorten your notes to 500 characters or less.';
         } elseif ($message === '') {
             $quantity = (int) $quantity_raw;
-            $charge = order_charge($provider_rate, $quantity, category_markup_percent($config, $service_category));
+            $charge = order_charge($provider_rate, $quantity, category_markup_percent($config, $service_category), empty($selected_row['_manual'] ?? null));
             if ($charge === null) { $charge = 0.00; }
             if ($balance === null) {
                 $message = 'We couldn\'t reach our system just now — please try again in a moment. Nothing was charged.';
@@ -209,7 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $form_disabled = !$db_ready || $maintenance || $api_failed;
 $bar_rate = 0; $bar_min = 1; $bar_max = 1000000; $bar_qty = '';
 if ($selected_row !== null) {
-    $bar_rate = retail_price($selected_row['rate'] ?? $selected_row['price'] ?? null, category_markup_percent($config, (string) ($selected_row['category'] ?? ''))) ?? 0;
+    $bar_rate = retail_price($selected_row['rate'] ?? $selected_row['price'] ?? null, category_markup_percent($config, (string) ($selected_row['category'] ?? '')), empty($selected_row['_manual'])) ?? 0;
     $bar_min = (int) ($selected_row['min'] ?? 1);
     $bar_max = (int) ($selected_row['max'] ?? 1000000);
     $bar_qty = trim($_POST['quantity'] ?? '');
@@ -311,7 +311,7 @@ require __DIR__ . '/includes/header.php';
   <label for="service_id">Choose Your Service</label>
   <select id="service_id" name="service_id" required <?php echo $form_disabled ? 'disabled' : ''; ?>>
     <option value="">— Choose a service —</option>
-    <?php foreach ($order_services as $row): $row_id = (string) ($row['service'] ?? $row['id'] ?? ''); $row_name = (string) ($row['name'] ?? $row['service_name'] ?? $row_id); $retail = retail_price($row['rate'] ?? $row['price'] ?? null, category_markup_percent($config, (string) ($row['category'] ?? ''))); $row_rate = $retail === null ? '' : ' — ' . number_format($retail, 2) . ' ' . $config['currency'] . '/1000'; $row_dt = service_delivery_time($row); $row_time = $row_dt !== '' ? ' — Delivery: ' . $row_dt : ''; ?>
+    <?php foreach ($order_services as $row): $row_id = (string) ($row['service'] ?? $row['id'] ?? ''); $row_name = (string) ($row['name'] ?? $row['service_name'] ?? $row_id); $retail = retail_price($row['rate'] ?? $row['price'] ?? null, category_markup_percent($config, (string) ($row['category'] ?? '')), empty($row['_manual'])); $row_rate = $retail === null ? '' : ' — ' . number_format($retail, 2) . ' ' . $config['currency'] . '/1000'; $row_dt = service_delivery_time($row); $row_time = $row_dt !== '' ? ' — Delivery: ' . $row_dt : ''; ?>
     <option value="<?php echo htmlspecialchars($row_id); ?>" data-category="<?php echo htmlspecialchars((string) ($row['category'] ?? '')); ?>" data-rate="<?php echo htmlspecialchars((string) ($retail ?? 0)); ?>" data-min="<?php echo (int) ($row['min'] ?? 1); ?>" data-max="<?php echo (int) ($row['max'] ?? 1000000); ?>"<?php echo $row_id === $preselected_id ? ' selected' : ''; ?>><?php echo htmlspecialchars($row_name . $row_rate . $row_time); ?></option>
     <?php endforeach; ?>
   </select>
