@@ -245,7 +245,7 @@ foreach ($overrides as $oid => $ov) {
         $display[] = ['id' => (string) $oid, 'name' => (string) ($ov['display_name'] ?? $oid), 'category' => (string) ($ov['manual_category'] ?? '—'), 'retail' => null, 'min' => null, 'max' => null, 'status' => 'Invalid (same ID as a live service)', 'kind' => 'invalid', 'ov' => $ov];
     } elseif ($is_manual) {
         $hidden = (int) ($ov['is_hidden'] ?? 0) === 1;
-        $display[] = ['id' => (string) $oid, 'name' => (string) ($ov['display_name'] ?? $oid), 'category' => (string) ($ov['manual_category'] ?? '—'), 'retail' => retail_price($ov['manual_rate'] ?? null, category_markup_percent($config, (string) ($ov['manual_category'] ?? ''))), 'min' => $ov['manual_min'], 'max' => $ov['manual_max'], 'status' => $hidden ? 'Manual (hidden)' : 'Manual', 'kind' => $hidden ? 'hidden' : 'manual', 'ov' => $ov];
+        $display[] = ['id' => (string) $oid, 'name' => (string) ($ov['display_name'] ?? $oid), 'category' => (string) ($ov['manual_category'] ?? '—'), 'retail' => retail_price($ov['manual_rate'] ?? null, category_markup_percent($config, (string) ($ov['manual_category'] ?? '')), false), 'min' => $ov['manual_min'], 'max' => $ov['manual_max'], 'status' => $hidden ? 'Manual (hidden)' : 'Manual', 'kind' => $hidden ? 'hidden' : 'manual', 'ov' => $ov];
     } elseif (!$in_live) {
         $display[] = ['id' => (string) $oid, 'name' => 'No longer in the live list', 'category' => '—', 'retail' => null, 'min' => null, 'max' => null, 'status' => 'Orphaned hidden override', 'kind' => 'orphan', 'ov' => $ov];
     }
