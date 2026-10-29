@@ -79,6 +79,16 @@ function get_effective_config() {
     if (isset($saved['markup_percent']) && is_numeric($saved['markup_percent'])) {
         $config['markup_percent'] = (float) $saved['markup_percent'];
     }
+    // USD -> PKR rate. Provider (ZeeXFame API) rates are in USD per 1,000;
+    // customer-facing prices are in PKR, so live rates MUST be converted
+    // (2026-10-29 fix: without this, prices showed ~277x too low, e.g.
+    // 0.01 PKR instead of ~Rs 2.77). Admin-editable in Admin Settings;
+    // default is the panel's live PKR rate when nothing is saved yet.
+    if (isset($saved['currency_rate']) && is_numeric($saved['currency_rate']) && (float) $saved['currency_rate'] > 0) {
+        $config['currency_rate'] = (float) $saved['currency_rate'];
+    } elseif (!isset($config['currency_rate']) || !is_numeric($config['currency_rate']) || (float) $config['currency_rate'] <= 0) {
+        $config['currency_rate'] = 277.46;
+    }
     if (isset($saved['other_services_url']) && is_string($saved['other_services_url'])) {
         $config['other_services_url'] = $saved['other_services_url'];
     }
@@ -204,17 +214,31 @@ function category_markup_percent($config, $category) {
     return is_numeric($config['markup_percent'] ?? null) ? (float) $config['markup_percent'] : 0.0;
 }
 
-/* Pricing maths, unchanged from v1. Callers resolve the category
-   markup first with category_markup_percent() and pass it here. */
-function retail_price($provider_rate, $markup_percent) {
+/* Pricing maths. Callers resolve the category markup first with
+   category_markup_percent() and pass it here.
+   Provider rates are USD per 1,000; customer prices are PKR, so live
+   rates are converted with the admin-set USD->PKR rate (2026-10-29
+   fix). Manual rows are already priced in PKR by the admin, so
+   callers pass $convert_currency = false for them. */
+function panel_currency_rate() {
+    static $fx = null;
+    if ($fx === null) {
+        $cfg = get_effective_config();
+        $fx = (isset($cfg['currency_rate']) && is_numeric($cfg['currency_rate']) && (float) $cfg['currency_rate'] > 0)
+            ? (float) $cfg['currency_rate'] : 277.46;
+    }
+    return $fx;
+}
+function retail_price($provider_rate, $markup_percent, $convert_currency = true) {
     if (!is_numeric($provider_rate)) return null;
     $rate = (float) $provider_rate;
+    if ($convert_currency) $rate *= panel_currency_rate();
     $markup = is_numeric($markup_percent) ? (float) $markup_percent : 0.0;
     if ($markup < 0) $markup = 0;
     return round($rate * (1 + $markup / 100), 2);
 }
-function order_charge($provider_rate, $quantity, $markup_percent) {
-    $retail = retail_price($provider_rate, $markup_percent);
+function order_charge($provider_rate, $quantity, $markup_percent, $convert_currency = true) {
+    $retail = retail_price($provider_rate, $markup_percent, $convert_currency);
     if ($retail === null) return null;
     return round($retail / 1000 * (int) $quantity, 2);
 }
