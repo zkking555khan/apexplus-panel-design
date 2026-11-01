@@ -46,16 +46,18 @@ $sun_svg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wi
     <button class="theme-toggle" id="theme_toggle" type="button" aria-label="Switch between light and dark theme"><?php echo $site_theme === 'daylight' ? $moon_svg : $sun_svg; ?></button>
     <button class="nav-toggle" type="button" aria-label="Toggle navigation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
     <nav class="main-nav">
-      <a href="index.php"<?php echo nav_class('home', $active); ?>>Home</a>
-      <a href="services.php"<?php echo nav_class('services', $active); ?>>Services</a>
-      <a href="add-funds.php"<?php echo nav_class('funds', $active); ?>>Add Funds</a>
       <?php if (!empty($_SESSION['user_id'])): ?>
       <a href="dashboard.php"<?php echo nav_class('dashboard', $active); ?>>Dashboard</a>
+      <a href="services.php"<?php echo nav_class('services', $active); ?>>Services</a>
+      <a href="add-funds.php"<?php echo nav_class('funds', $active); ?>>Add Fund</a>
       <a href="new-order.php"<?php echo nav_class('new-order', $active); ?>>New Order</a>
       <a href="orders.php"<?php echo nav_class('orders', $active); ?>>My Orders</a>
       <a href="tickets.php"<?php echo nav_class('tickets', $active); ?>>Support Tickets</a>
       <a href="logout.php">Logout (<?php echo htmlspecialchars($_SESSION['username'] ?? ''); ?>)</a>
       <?php else: ?>
+      <a href="index.php"<?php echo nav_class('home', $active); ?>>Home</a>
+      <a href="services.php"<?php echo nav_class('services', $active); ?>>Services</a>
+      <a href="add-funds.php"<?php echo nav_class('funds', $active); ?>>Add Fund</a>
       <a class="nav-login" href="login.php"<?php echo nav_class('login', $active); ?>>Login</a>
       <a class="nav-signup" href="signup.php"<?php echo nav_class('signup', $active); ?>>Sign Up</a>
       <?php endif; ?>
