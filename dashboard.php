@@ -83,8 +83,6 @@ require __DIR__ . '/includes/header.php';
 <?php endif; ?>
 <div class="grid">
   <div class="card balance-card"><p class="balance-label">Your Balance</p><p class="balance-amount"><?php echo htmlspecialchars(number_format($balance, 2) . ' ' . $config['currency']); ?></p><p><a class="btn btn-blue" href="add-funds.php">Add Funds Now</a></p></div>
-  <div class="card card-accent-teal"><h3>Your Orders</h3><p class="stat-value"><?php echo (int) $total_orders; ?> total · <?php echo (int) $pending_orders; ?> still in progress</p><p><a href="orders.php">View My Orders</a> &nbsp;|&nbsp; <a href="new-order.php">Place a New Order</a></p></div>
-  <div class="card card-accent-violet"><h3>Support &amp; Funds</h3><p class="stat-value"><?php echo (int) $open_tickets; ?> open tickets · <?php echo (int) $pending_funds; ?> fund requests waiting</p><p><a href="tickets.php">Open a Ticket</a> &nbsp;|&nbsp; <a href="add-funds.php">Add Funds</a></p></div>
 </div>
 <h2>Your Recent Orders <span class="small"><a href="orders.php">View all →</a></span></h2>
 <?php if (empty($recent)): ?>
