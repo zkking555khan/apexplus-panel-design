@@ -46,6 +46,7 @@ function nav_class($name, $active) {
       <a href="new-order.php"<?php echo nav_class('new-order', $active); ?>>New Order</a>
       <a href="orders.php"<?php echo nav_class('orders', $active); ?>>My Orders</a>
       <a href="tickets.php"<?php echo nav_class('tickets', $active); ?>>Support Tickets</a>
+      <a href="reviews.php"<?php echo nav_class('reviews', $active); ?>>Reviews</a>
       <a href="logout.php">Logout (<?php echo htmlspecialchars($_SESSION['username'] ?? ''); ?>)</a>
       <?php else: ?>
       <?php endif; ?>
