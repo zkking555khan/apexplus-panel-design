@@ -29,10 +29,6 @@ function nav_class($name, $active) {
 <meta name="description" content="<?php echo htmlspecialchars($meta_description ?? 'SMM APEX PLUS — social media services panel. Services are supplied by SMM APEX PLUS.'); ?>">
 <link rel="icon" type="image/webp" href="assets/img/logo.webp">
 <link rel="stylesheet" href="assets/css/style-v2.css?v=20261029h">
-<script>/* Visitor theme (header switcher): saved on this device only, never
-  changes the admin's site default for other visitors. Applied here, before
-  first paint, so the page does not flash the default theme first. */
-try { var __t = localStorage.getItem('apex_theme'); if (__t) { document.documentElement.setAttribute('data-theme', __t); } } catch (e) {}</script>
 </head>
 <body>
 <header class="site-header">
@@ -41,9 +37,6 @@ try { var __t = localStorage.getItem('apex_theme'); if (__t) { document.document
       <img src="assets/img/logo.webp" alt="SMM APEX PLUS logo" width="48" height="48">
       <span class="brand-text">SMM <span>APEX</span> PLUS</span>
     </a>
-<?php $moon_svg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-$sun_svg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>'; ?>
-    <button class="theme-toggle" id="theme_toggle" type="button" aria-label="Switch between light and dark theme"><?php echo $site_theme === 'daylight' ? $moon_svg : $sun_svg; ?></button>
     <button class="nav-toggle" type="button" aria-label="Toggle navigation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
     <nav class="main-nav">
       <?php if (!empty($_SESSION['user_id'])): ?>
@@ -70,35 +63,6 @@ $sun_svg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wi
     </nav>
   </div>
 </header>
-<script>/* Theme toggle, inline in the page itself (2026-10-29 fix): the
-   external JS file can sit cached on a phone for days, which is why
-   the button did nothing after deploy. This handler runs with the
-   fresh page every time, so a tap always works. One tap: white <->
-   dark; the visitor's last dark theme is remembered on their device
-   only, never the admin's default for others. */
-(function () {
-  var btn = document.getElementById('theme_toggle');
-  if (!btn) return;
-  function cur() { return document.documentElement.getAttribute('data-theme') || 'daylight'; }
-  function sync() {
-    if (cur() === 'daylight') { btn.innerHTML = '<?php echo $moon_svg; ?>'; btn.setAttribute('aria-label', 'Switch to dark theme'); }
-    else { btn.innerHTML = '<?php echo $sun_svg; ?>'; btn.setAttribute('aria-label', 'Switch to light theme'); }
-  }
-  sync();
-  btn.addEventListener('click', function () {
-    var c = cur(), next;
-    if (c === 'daylight') {
-      try { next = localStorage.getItem('apex_last_dark') || 'midnight-navy'; }
-      catch (e) { next = 'midnight-navy'; }
-    } else {
-      try { localStorage.setItem('apex_last_dark', c); } catch (e) {}
-      next = 'daylight';
-    }
-    document.documentElement.setAttribute('data-theme', next);
-    try { localStorage.setItem('apex_theme', next); } catch (e) {}
-    sync();
-  });
-})();</script>
 <main class="wrap">
 <?php if (!empty($config['announcement'])): ?>
   <p class="notice"><?php echo htmlspecialchars($config['announcement']); ?></p>
