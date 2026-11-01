@@ -82,7 +82,7 @@ require __DIR__ . '/includes/header.php';
 <p class="notice notice-warning">Needs your attention: <?php $parts = []; if ($pending_funds > 0) $parts[] = '<a href="add-funds.php">' . (int) $pending_funds . ' fund request(s) waiting</a>'; if ($pending_orders > 0) $parts[] = '<a href="orders.php">' . (int) $pending_orders . ' order(s) in progress</a>'; if ($open_tickets > 0) $parts[] = '<a href="tickets.php">' . (int) $open_tickets . ' open ticket(s)</a>'; echo implode(' · ', $parts); ?></p>
 <?php endif; ?>
 <div class="grid">
-  <div class="card balance-card"><p class="balance-label">Your Balance</p><p class="balance-amount"><?php echo htmlspecialchars(number_format($balance, 2) . ' ' . $config['currency']); ?></p><p class="balance-note">Top up anytime with EasyPaisa, JazzCash or UPaisa.</p><p><a class="btn btn-blue" href="add-funds.php">Add Funds Now</a></p></div>
+  <div class="card balance-card"><p class="balance-label">Your Balance</p><p class="balance-amount"><?php echo htmlspecialchars(number_format($balance, 2) . ' ' . $config['currency']); ?></p><p><a class="btn btn-blue" href="add-funds.php">Add Funds Now</a></p></div>
   <div class="card card-accent-teal"><h3>Your Orders</h3><p class="stat-value"><?php echo (int) $total_orders; ?> total · <?php echo (int) $pending_orders; ?> still in progress</p><p><a href="orders.php">View My Orders</a> &nbsp;|&nbsp; <a href="new-order.php">Place a New Order</a></p></div>
   <div class="card card-accent-violet"><h3>Support &amp; Funds</h3><p class="stat-value"><?php echo (int) $open_tickets; ?> open tickets · <?php echo (int) $pending_funds; ?> fund requests waiting</p><p><a href="tickets.php">Open a Ticket</a> &nbsp;|&nbsp; <a href="add-funds.php">Add Funds</a></p></div>
 </div>
