@@ -48,11 +48,6 @@ function nav_class($name, $active) {
       <a href="tickets.php"<?php echo nav_class('tickets', $active); ?>>Support Tickets</a>
       <a href="logout.php">Logout (<?php echo htmlspecialchars($_SESSION['username'] ?? ''); ?>)</a>
       <?php else: ?>
-      <a href="index.php"<?php echo nav_class('home', $active); ?>>Home</a>
-      <a href="services.php"<?php echo nav_class('services', $active); ?>>Services</a>
-      <a href="add-funds.php"<?php echo nav_class('funds', $active); ?>>Add Fund</a>
-      <a class="nav-login" href="login.php"<?php echo nav_class('login', $active); ?>>Login</a>
-      <a class="nav-signup" href="signup.php"<?php echo nav_class('signup', $active); ?>>Sign Up</a>
       <?php endif; ?>
       <?php if (!empty($_SESSION['admin_logged_in'])): ?>
       <a href="admin-overview.php"<?php echo nav_class('admin', $active); ?>>Admin Overview</a>
