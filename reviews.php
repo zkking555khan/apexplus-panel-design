@@ -26,6 +26,8 @@ require __DIR__ . '/includes/header.php';
     <input type="text" id="review_name" name="full_name" placeholder="Your full name" disabled>
     <label for="review_service">Service Name</label>
     <input type="text" id="review_service" name="service_name" placeholder="The service you used" disabled>
+    <p>Star Rating (1-5)</p>
+    <p><label><input type="radio" name="rating" value="1" disabled> 1</label> <label><input type="radio" name="rating" value="2" disabled> 2</label> <label><input type="radio" name="rating" value="3" disabled> 3</label> <label><input type="radio" name="rating" value="4" disabled> 4</label> <label><input type="radio" name="rating" value="5" disabled> 5</label></p>
     <label for="review_description">Review Description</label>
     <textarea id="review_description" name="description" rows="4" placeholder="How was your experience?" disabled></textarea>
     <label for="review_screenshot">Screenshot (optional)</label>
@@ -34,6 +36,7 @@ require __DIR__ . '/includes/header.php';
     <p><button class="btn btn-blue" type="submit" disabled>Submit Review</button></p>
   </form>
 </div>
+<div class="card"><h3>Average Rating</h3><p class="stat-value">—</p><p class="small">No approved reviews yet.</p></div>
 <h2>Customer Reviews</h2>
 <p>No reviews yet — reviews submitted by customers will appear here.</p>
 <?php require __DIR__ . '/includes/footer.php'; ?>
