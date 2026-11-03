@@ -1,9 +1,9 @@
 <?php
 /**
  * SMM APEX PLUS — customer dashboard (v2).
- * Logged-in customers only. Shows balance, order counts, recent
- * orders, open tickets and pending fund requests — all filtered to
- * the session user, never another customer's data.
+ * Logged-in customers only. Shows the five dashboard statistics,
+ * Quick Actions and Announcements — all filtered to the session
+ * user, never another customer's data. Recent orders live on My Orders.
  */
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/settings.php';
@@ -19,7 +19,8 @@ $total_orders = 0;
 $pending_orders = 0;
 $open_tickets = 0;
 $pending_funds = 0;
-$recent = [];
+$completed_orders = 0;
+$total_spent = 0;
 if ($db_ready) {
     $conn = db_connect();
     if ($conn !== null) {
@@ -31,15 +32,18 @@ if ($db_ready) {
         if ($row) {
             $balance = (float) $row['balance'];
         }
-        $stmt = $conn->prepare('SELECT COUNT(*) c, SUM(status = ?) p FROM orders WHERE user_id = ?');
+        $stmt = $conn->prepare('SELECT COUNT(*) c, SUM(status = ?) p, SUM(status = ?) comp, SUM(CASE WHEN charge_deducted = 1 THEN charge ELSE 0 END) spent FROM orders WHERE user_id = ?');
         $pend = 'Pending';
-        $stmt->bind_param('si', $pend, $user['id']);
+        $comp = 'Completed';
+        $stmt->bind_param('ssi', $pend, $comp, $user['id']);
         $stmt->execute();
         $row = $stmt->get_result()->fetch_assoc();
         $stmt->close();
         if ($row) {
             $total_orders = (int) $row['c'];
             $pending_orders = (int) $row['p'];
+            $completed_orders = (int) ($row['comp'] ?? 0);
+            $total_spent = (float) ($row['spent'] ?? 0);
         }
         $stmt = $conn->prepare('SELECT COUNT(*) c FROM tickets WHERE user_id = ? AND status = ?');
         $open = 'open';
@@ -58,14 +62,6 @@ if ($db_ready) {
         if ($row) {
             $pending_funds = (int) $row['c'];
         }
-        $stmt = $conn->prepare('SELECT id, service_name, quantity, status, charge, created_at FROM orders WHERE user_id = ? ORDER BY created_at DESC, id DESC LIMIT 5');
-        $stmt->bind_param('i', $user['id']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        while ($row = $result->fetch_assoc()) {
-            $recent[] = $row;
-        }
-        $stmt->close();
         $conn->close();
     } else {
         $db_ready = false;
@@ -81,30 +77,19 @@ require __DIR__ . '/includes/header.php';
 <p class="notice notice-warning">Needs your attention: <?php $parts = []; if ($pending_funds > 0) $parts[] = '<a href="add-funds.php">' . (int) $pending_funds . ' fund request(s) waiting</a>'; if ($pending_orders > 0) $parts[] = '<a href="orders.php">' . (int) $pending_orders . ' order(s) in progress</a>'; if ($open_tickets > 0) $parts[] = '<a href="tickets.php">' . (int) $open_tickets . ' open ticket(s)</a>'; echo implode(' · ', $parts); ?></p>
 <?php endif; ?>
 <div class="grid">
-  <div class="card balance-card"><p class="balance-label">Your Balance</p><p class="balance-amount"><?php echo htmlspecialchars(number_format($balance, 2) . ' ' . $config['currency']); ?></p><p><a class="btn btn-blue" href="add-funds.php">Add Funds Now</a></p></div>
+  <div class="card"><h3>Available Balance</h3><p class="stat-value"><?php echo htmlspecialchars(number_format($balance, 2) . ' ' . $config['currency']); ?></p></div>
+  <div class="card"><h3>Total Orders</h3><p class="stat-value"><?php echo (int) $total_orders; ?></p></div>
+  <div class="card"><h3>Completed Orders</h3><p class="stat-value"><?php echo (int) $completed_orders; ?></p></div>
+  <div class="card"><h3>Pending Orders</h3><p class="stat-value"><?php echo (int) $pending_orders; ?></p></div>
+  <div class="card"><h3>Total Spent</h3><p class="stat-value"><?php echo htmlspecialchars(number_format($total_spent, 2) . ' ' . $config['currency']); ?></p></div>
 </div>
-<h2>Your Recent Orders <span class="small"><a href="orders.php">View all →</a></span></h2>
-<?php if (empty($recent)): ?>
-<p>You haven't placed an order yet — your first one is just a minute away.</p>
-<p><a class="btn btn-blue" href="new-order.php">Place Your First Order</a></p>
+<h2>Quick Actions</h2>
+<p><a class="btn btn-blue" href="add-funds.php">Add Funds</a> <a class="btn btn-blue" href="new-order.php">New Order</a></p>
+<h2>Announcements</h2>
+<?php if (trim((string) ($config['announcement'] ?? '')) !== ''): ?>
+<div class="card"><p><?php echo htmlspecialchars((string) $config['announcement']); ?></p></div>
 <?php else: ?>
-<div class="table-wrap">
-<table>
-  <thead><tr><th>ID</th><th>Service</th><th>Qty</th><th>Charge</th><th>Status</th><th>Placed</th></tr></thead>
-  <tbody>
-    <?php foreach ($recent as $row): ?>
-    <tr>
-      <td><a href="orders.php?id=<?php echo (int) $row['id']; ?>">#<?php echo (int) $row['id']; ?></a></td>
-      <td><?php echo htmlspecialchars($row['service_name']); ?></td>
-      <td><?php echo (int) $row['quantity']; ?></td>
-      <td><?php echo htmlspecialchars(number_format((float) ($row['charge'] ?? 0), 2)); ?></td>
-      <td><?php echo status_pill($row['status']); ?></td>
-      <td><?php echo htmlspecialchars($row['created_at']); ?></td>
-    </tr>
-    <?php endforeach; ?>
-  </tbody>
-</table>
-</div>
+<p>No announcements yet.</p>
 <?php endif; ?>
 <?php endif; ?>
 <?php require __DIR__ . '/includes/footer.php'; ?>
