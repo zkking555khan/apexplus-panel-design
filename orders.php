@@ -20,6 +20,9 @@ $detail = null;
 $orders = [];
 $created_id = isset($_GET['created']) ? (int) $_GET['created'] : 0;
 $detail_id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+$filter_status = trim($_GET['status'] ?? '');
+$allowed_statuses = ['Pending', 'Processing', 'In Progress', 'Completed', 'Partial', 'Cancelled', 'Refunded'];
+if (!in_array($filter_status, $allowed_statuses, true)) $filter_status = '';
 
 if ($db_ready) {
     $conn = db_connect();
@@ -45,13 +48,14 @@ if ($db_ready) {
     }
 }
 
+if ($filter_status !== '' && $detail_id === 0) { $orders = array_values(array_filter($orders, function ($r) use ($filter_status) { return (string) ($r['status'] ?? '') === $filter_status; })); }
 require __DIR__ . '/includes/header.php';
 ?>
 <h1>Your Orders</h1>
 <?php if ($created_id > 0): ?><p class="notice notice-success">Order #<?php echo (int) $created_id; ?> placed successfully! Track it below — its Tracking ID appears once it is sent for processing.</p><?php endif; ?>
 <?php if (isset($_GET['welcome'])): ?><p class="notice">Welcome, <?php echo htmlspecialchars($user['username']); ?>! Your account is ready — pick a service and grow faster.</p><?php endif; ?>
 <?php if (!$db_ready): ?>
-  <p class="notice">Orders are opening soon — please check back shortly.</p>
+  <p class="notice">Orders are not available right now — please try again later.</p>
 <?php elseif ($detail_id > 0): ?>
   <?php if ($detail === null): ?>
     <p class="notice">We couldn't find that order — it may belong to a different account.</p>
@@ -75,20 +79,23 @@ require __DIR__ . '/includes/header.php';
   <p>No orders yet — your first order is just a minute away.</p>
   <p><a class="btn btn-blue" href="new-order.php">Place Your First Order</a></p>
 <?php else: ?>
+  <p><a class="btn btn-outline" href="orders.php">All Orders</a> <a class="btn btn-outline" href="orders.php?status=Pending">Pending</a> <a class="btn btn-outline" href="orders.php?status=Processing">Processing</a> <a class="btn btn-outline" href="orders.php?status=In Progress">In Progress</a> <a class="btn btn-outline" href="orders.php?status=Completed">Completed</a> <a class="btn btn-outline" href="orders.php?status=Partial">Partial</a> <a class="btn btn-outline" href="orders.php?status=Cancelled">Cancelled</a> <a class="btn btn-outline" href="orders.php?status=Refunded">Refunded</a></p>
   <div class="table-wrap">
   <table>
     <thead>
-      <tr><th>ID</th><th>Service</th><th>Quantity</th><th>Charge</th><th>Status</th><th>Placed</th></tr>
+      <tr><th>ID</th><th>Service</th><th>Link</th><th>Quantity</th><th>Charge</th><th>Status</th><th>Placed</th><th>Actions</th></tr>
     </thead>
     <tbody>
       <?php foreach ($orders as $row): ?>
       <tr>
         <td><a href="orders.php?id=<?php echo (int) $row['id']; ?>">#<?php echo (int) $row['id']; ?></a></td>
         <td><?php echo htmlspecialchars($row['service_name']); ?></td>
+        <td><?php echo htmlspecialchars($row['link']); ?></td>
         <td><?php echo (int) $row['quantity']; ?></td>
         <td><?php echo htmlspecialchars(number_format((float) ($row['charge'] ?? 0), 2)); ?></td>
         <td><?php echo status_pill($row['status']); ?></td>
         <td><?php echo htmlspecialchars($row['created_at']); ?></td>
+        <td><a href="orders.php?id=<?php echo (int) $row['id']; ?>">View Details</a> <button type="button" class="btn btn-outline" onclick="navigator.clipboard.writeText('<?php echo (int) $row['id']; ?>'); this.textContent='Copied';">Copy ID</button></td>
       </tr>
       <?php endforeach; ?>
     </tbody>
