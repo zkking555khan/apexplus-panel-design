@@ -77,7 +77,6 @@ require __DIR__ . '/includes/header.php';
 <h1>Support — We're Here To Help</h1>
 <?php if ($message !== ''): ?><p class="notice"><?php echo htmlspecialchars($message); ?></p><?php endif; ?>
 <?php if (!$db_ready): ?>
-<p class="notice">Support tickets are opening soon — please check back shortly. You can still reach us on WhatsApp or email below.</p>
 <?php else: ?>
 <h2>Ask Us Anything</h2>
 <form method="post" action="tickets.php">
