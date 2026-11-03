@@ -42,10 +42,10 @@ function nav_class($name, $active) {
       <?php if (!empty($_SESSION['user_id'])): ?>
       <a href="dashboard.php"<?php echo nav_class('dashboard', $active); ?>>Dashboard</a>
       <a href="services.php"<?php echo nav_class('services', $active); ?>>Services</a>
-      <a href="add-funds.php"<?php echo nav_class('funds', $active); ?>>Add Fund</a>
+      <a href="add-funds.php"<?php echo nav_class('funds', $active); ?>>Add Funds</a>
       <a href="new-order.php"<?php echo nav_class('new-order', $active); ?>>New Order</a>
       <a href="orders.php"<?php echo nav_class('orders', $active); ?>>My Orders</a>
-      <a href="tickets.php"<?php echo nav_class('tickets', $active); ?>>Support Tickets</a>
+      <a href="tickets.php"<?php echo nav_class('tickets', $active); ?>>Ticket Support</a>
       <a href="reviews.php"<?php echo nav_class('reviews', $active); ?>>Reviews</a>
       <a href="referral.php"<?php echo nav_class('referral', $active); ?>>Referral</a>
       <a href="logout.php">Logout (<?php echo htmlspecialchars($_SESSION['username'] ?? ''); ?>)</a>
