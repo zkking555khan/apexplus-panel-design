@@ -22,7 +22,7 @@ $my_requests = [];
 
 function payment_number($config, $method) {
     $n = trim($config['payments'][$method] ?? '');
-    return $n === '' ? 'Coming soon — please check back shortly.' : $n;
+    return $n === '' ? '—' : $n;
 }
 
 function payment_number_is_set($config, $method) {
@@ -35,7 +35,7 @@ function payment_description($config, $method) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user !== null) {
     if (!$db_ready) {
-        $message = 'Fund requests are opening soon — please check back shortly.';
+        $message = 'Fund requests are not available right now — please try again later.';
     } elseif ($maintenance) {
         $message = trim((string) ($config['maintenance_message'] ?? '')) !== '' ? trim((string) $config['maintenance_message']) : 'Fund requests are paused for maintenance right now — please check back shortly.';
     } elseif (!csrf_check($_POST['csrf_token'] ?? '')) {
@@ -99,7 +99,7 @@ require __DIR__ . '/includes/header.php';
 ?>
 <h1>Add Funds — Top Up in PKR</h1>
 <?php if ($any_number_blank): ?>
-<p>Send your payment to one of the numbers below, then submit your transaction ID here. Numbers marked 'Coming soon' are not ready yet — please do not send money to them.</p>
+<p>Send your payment only to a number shown below, then submit your transaction ID here.</p>
 <?php else: ?>
 <p>Send your payment to any number below, then submit your transaction ID — it's that easy. Your balance is updated as soon as support approves your payment.</p>
 <?php endif; ?>
@@ -110,21 +110,21 @@ require __DIR__ . '/includes/header.php';
     <p class="small">Pakistan's most-loved wallet</p>
     <p>Send payment to: <span class="pay-number"><?php echo htmlspecialchars(payment_number($config, 'easypaisa')); ?></span></p>
     <?php if (payment_number_is_set($config, 'easypaisa')): ?><p><button type="button" class="btn btn-outline" data-copy-number="<?php echo htmlspecialchars(trim($config['payments']['easypaisa'])); ?>">Copy Number</button></p><?php endif; ?>
-    <p class="pay-desc"><?php $pd = payment_description($config, 'easypaisa'); echo htmlspecialchars($pd !== '' ? $pd : 'Account holder details will appear here soon.'); ?></p>
+    <p class="pay-desc"><?php $pd = payment_description($config, 'easypaisa'); echo htmlspecialchars($pd); ?></p>
   </div>
   <div class="card pay-card pay-card-jazzcash">
     <h3>JazzCash</h3>
     <p class="small">Fast, easy mobile payments</p>
     <p>Send payment to: <span class="pay-number"><?php echo htmlspecialchars(payment_number($config, 'jazzcash')); ?></span></p>
     <?php if (payment_number_is_set($config, 'jazzcash')): ?><p><button type="button" class="btn btn-outline" data-copy-number="<?php echo htmlspecialchars(trim($config['payments']['jazzcash'])); ?>">Copy Number</button></p><?php endif; ?>
-    <p class="pay-desc"><?php $pd = payment_description($config, 'jazzcash'); echo htmlspecialchars($pd !== '' ? $pd : 'Account holder details will appear here soon.'); ?></p>
+    <p class="pay-desc"><?php $pd = payment_description($config, 'jazzcash'); echo htmlspecialchars($pd); ?></p>
   </div>
   <div class="card pay-card pay-card-upaisa">
     <h3>UPaisa</h3>
     <p class="small">Simple payments, made easy</p>
     <p>Send payment to: <span class="pay-number"><?php echo htmlspecialchars(payment_number($config, 'upaisa')); ?></span></p>
     <?php if (payment_number_is_set($config, 'upaisa')): ?><p><button type="button" class="btn btn-outline" data-copy-number="<?php echo htmlspecialchars(trim($config['payments']['upaisa'])); ?>">Copy Number</button></p><?php endif; ?>
-    <p class="pay-desc"><?php $pd = payment_description($config, 'upaisa'); echo htmlspecialchars($pd !== '' ? $pd : 'Account holder details will appear here soon.'); ?></p>
+    <p class="pay-desc"><?php $pd = payment_description($config, 'upaisa'); echo htmlspecialchars($pd); ?></p>
   </div>
 </div>
 
@@ -134,7 +134,7 @@ require __DIR__ . '/includes/header.php';
 <?php if ($user === null): ?>
 <p class="notice">Please <a href="login.php">log in</a> to submit your payment.</p>
 <?php elseif (!$db_ready): ?>
-<p class="notice">Fund requests are opening soon — please check back shortly.</p>
+<p class="notice">Fund requests are not available right now — please try again later.</p>
 <?php elseif ($maintenance): ?>
 <p class="notice notice-warning"><?php echo htmlspecialchars(trim((string) ($config['maintenance_message'] ?? '')) !== '' ? trim((string) $config['maintenance_message']) : 'Fund requests are paused for maintenance right now — please check back shortly.'); ?></p>
 <?php else: ?>
