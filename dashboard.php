@@ -76,7 +76,6 @@ require __DIR__ . '/includes/header.php';
 <h1>Your Dashboard</h1>
 <p>Welcome back, <?php echo htmlspecialchars($user['username']); ?> — here's everything at a glance.</p>
 <?php if (!$db_ready): ?>
-<p class="notice">Dashboard is opening soon — please check back shortly.</p>
 <?php else: ?>
 <?php if ($pending_funds > 0 || $pending_orders > 0 || $open_tickets > 0): ?>
 <p class="notice notice-warning">Needs your attention: <?php $parts = []; if ($pending_funds > 0) $parts[] = '<a href="add-funds.php">' . (int) $pending_funds . ' fund request(s) waiting</a>'; if ($pending_orders > 0) $parts[] = '<a href="orders.php">' . (int) $pending_orders . ' order(s) in progress</a>'; if ($open_tickets > 0) $parts[] = '<a href="tickets.php">' . (int) $open_tickets . ' open ticket(s)</a>'; echo implode(' · ', $parts); ?></p>
