@@ -60,13 +60,16 @@ require __DIR__ . '/includes/header.php';
 $filter_cat = trim($_GET['category'] ?? '');
 $filter_q = trim($_GET['q'] ?? '');
 $filter_sort = trim($_GET['sort'] ?? '');
+$filter_price_min = trim($_GET['price_min'] ?? '');
+$filter_price_max = trim($_GET['price_max'] ?? '');
 $cats = [];
 if (is_array($services)) { foreach ($services as $r) { $c = (string) ($r['category'] ?? ''); if ($c !== '' && !in_array($c, $cats, true)) $cats[] = $c; } sort($cats); }
 $shown = [];
 if (is_array($services)) { foreach ($services as $r) {
-  $c = (string) ($r['category'] ?? ''); $n = (string) ($r['name'] ?? $r['service'] ?? '');
+  $c = (string) ($r['category'] ?? ''); $n = (string) ($r['name'] ?? $r['service'] ?? ''); $sid = (string) ($r['service'] ?? $r['id'] ?? '');
   if ($filter_cat !== '' && $c !== $filter_cat) continue;
-  if ($filter_q !== '' && stripos($n, $filter_q) === false && stripos($c, $filter_q) === false) continue;
+  if ($filter_q !== '' && stripos($n, $filter_q) === false && stripos($c, $filter_q) === false && stripos($sid, $filter_q) === false) continue;
+  if ($filter_price_min !== '' || $filter_price_max !== '') { $rp = retail_price($r['rate'] ?? $r['price'] ?? null, category_markup_percent($config, (string) ($r['category'] ?? '')), empty($r['_manual'])); if ($rp === null) continue; if ($filter_price_min !== '' && is_numeric($filter_price_min) && $rp < (float) $filter_price_min) continue; if ($filter_price_max !== '' && is_numeric($filter_price_max) && $rp > (float) $filter_price_max) continue; }
   $shown[] = $r;
 } }
 // Server-side sort: price low→high, price high→low, name A–Z. Default keeps catalogue order.
@@ -122,7 +125,7 @@ function service_extra_details($row) {
 </nav>
 <form method="get" action="services.php" class="filter-form" id="service_filter_form">
   <label>Category <select name="category"><option value="">All categories</option><?php foreach ($cats as $c): ?><option value="<?php echo htmlspecialchars($c); ?>"<?php echo $c === $filter_cat ? ' selected' : ''; ?>><?php echo htmlspecialchars($c); ?></option><?php endforeach; ?></select></label>
-  <label>Search <input type="text" id="filter_q" name="q" value="<?php echo htmlspecialchars($filter_q); ?>" placeholder="Search services — try &quot;followers&quot; or &quot;views&quot;"></label>
+  <label>Search <input type="text" id="filter_q" name="q" value="<?php echo htmlspecialchars($filter_q); ?>" placeholder="Search services or a Service ID"></label><label>Min price <input type="number" name="price_min" value="<?php echo htmlspecialchars($filter_price_min); ?>" min="0" step="0.01"></label><label>Max price <input type="number" name="price_max" value="<?php echo htmlspecialchars($filter_price_max); ?>" min="0" step="0.01"></label>
   <label>Sort <select name="sort"><option value="">Catalogue order</option><option value="price_asc"<?php echo $filter_sort === 'price_asc' ? ' selected' : ''; ?>>Price: low to high</option><option value="price_desc"<?php echo $filter_sort === 'price_desc' ? ' selected' : ''; ?>>Price: high to low</option><option value="name_asc"<?php echo $filter_sort === 'name_asc' ? ' selected' : ''; ?>>Name: A to Z</option></select></label>
   <button class="btn btn-blue" type="submit">Find Services</button>
 </form>
