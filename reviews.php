@@ -19,7 +19,6 @@ require __DIR__ . '/includes/header.php';
 ?>
 <h1>Reviews</h1>
 <p>Share your experience with SMM APEX PLUS. Your review helps other customers choose the right service.</p>
-<p class="notice">Reviews are opening soon — this page is a design preview. Your review will not be saved until the backend is set up by the panel owner.</p>
 <div class="card">
   <h2>Submit a Review</h2>
   <form method="post" action="reviews.php" autocomplete="off">
