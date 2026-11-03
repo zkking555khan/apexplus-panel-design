@@ -398,3 +398,31 @@ input[type="datetime-local"], input[type="search"] {
 .feature-row h3 { margin: 0 0 6px; }
 .feature-row p { color: var(--muted); margin: 0 0 8px; }
 .feature-row p:last-child { margin-bottom: 0; }
+
+/* Premium depth polish — cleanup 2026-11-03.
+   Subtle layered depth only, for Dashboard, Add Funds, Tickets, Reviews,
+   Referral and all other pages that share this stylesheet.
+   Solid blue, white daylight default, 12px buttons. No purple gradient,
+   no neon, no glassmorphism, no heavy animation. */
+.card, .login-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, .08), 0 1px 3px rgba(15, 23, 42, .06);
+  transition: transform 180ms cubic-bezier(.22, 1, .36, 1), box-shadow 180ms cubic-bezier(.22, 1, .36, 1);
+}
+.card:hover, .login-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, .12), 0 2px 6px rgba(15, 23, 42, .06);
+}
+.btn-blue {
+  box-shadow: 0 6px 16px rgba(37, 99, 235, .28);
+}
+.btn-blue:hover {
+  box-shadow: 0 8px 20px rgba(37, 99, 235, .32);
+}
+.pay-card {
+  border-top: 3px solid var(--blue);
+}
+@media (prefers-reduced-motion: reduce) {
+  .card, .login-card, .btn-blue { transition: none; transform: none; }
+}
