@@ -19,7 +19,6 @@ require __DIR__ . '/includes/header.php';
 ?>
 <h1>Referral</h1>
 <p>Invite other members to SMM APEX PLUS and earn referral commission on their successful deposits.</p>
-<p class="notice">Referral is opening soon — this page is a design preview. Your referral link and earnings will appear here after the backend is set up by the panel owner.</p>
 <div class="card">
   <h2>Your Referral Link</h2>
   <p>Your referral link will appear here after backend setup.</p>
